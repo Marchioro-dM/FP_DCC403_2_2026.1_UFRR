@@ -1,0 +1,5 @@
+# Teste de comandos simples
+uname -a
+pwd
+echo "Hello Edge Engine!"
+ls -la
