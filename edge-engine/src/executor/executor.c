@@ -112,15 +112,18 @@ int execute_command(Command *cmd, int in_fd, int out_fd) {
         expand_wildcards(cmd);
         execvp(cmd->args[0], cmd->args);
 
+        /* execvp só retorna em caso de erro */
         if(errno == ENOENT) {
             fprintf(stderr, "edge-engine: comando não encontrado: %s\n", cmd->args[0]);
+            exit(127);
         } else if(errno == EACCES) {
             fprintf(stderr, "edge-engine: permissão negada: %s\n", cmd->args[0]);
+            exit(126);
         } else {
             fprintf(stderr, "edge-engine: erro ao executar %s: %s\n",
                     cmd->args[0], strerror(errno));
+            exit(EXIT_FAILURE);
         }
-        exit(EXIT_FAILURE);
     }
 
     return pid;
@@ -183,18 +186,42 @@ int execute_pipeline(Pipeline *pipeline) {
     pid_t pids[MAX_PIPES + 2]; /* +2 para produtor e consumidor */
     int pid_count = 0;
 
+    /*
+     * Bloqueia SIGCHLD antes de qualquer fork em jobs foreground.
+     * Sem isso, o handler em main.c pode recolher o filho (com waitpid -1)
+     * antes que execute_pipeline chame waitpid(pid), causando ECHILD e
+     * perdendo o exit status do comando.
+     */
+    sigset_t block_mask, old_mask;
+    sigemptyset(&block_mask);
+    sigaddset(&block_mask, SIGCHLD);
+    if(!pipeline->background) {
+        sigprocmask(SIG_BLOCK, &block_mask, &old_mask);
+    }
+
     if(num_pipes > 0) {
-        if(setup_pipes(pipe_fds, num_pipes) < 0) return -1;
+        if(setup_pipes(pipe_fds, num_pipes) < 0) {
+            if(!pipeline->background) sigprocmask(SIG_SETMASK, &old_mask, NULL);
+            return -1;
+        }
     }
 
     /* Pipe dedicado produtor→cmd[0] */
     if(pipeline->has_producer && pipeline->producer) {
-        if(pipe(producer_pipe) == -1) { perror("pipe"); return -1; }
+        if(pipe(producer_pipe) == -1) {
+            perror("pipe");
+            if(!pipeline->background) sigprocmask(SIG_SETMASK, &old_mask, NULL);
+            return -1;
+        }
     }
 
     /* Pipe dedicado cmd[last]→consumidor */
     if(pipeline->has_consumer && pipeline->consumer) {
-        if(pipe(consumer_pipe) == -1) { perror("pipe"); return -1; }
+        if(pipe(consumer_pipe) == -1) {
+            perror("pipe");
+            if(!pipeline->background) sigprocmask(SIG_SETMASK, &old_mask, NULL);
+            return -1;
+        }
     }
 
     /* Produtor (<=) */
@@ -260,10 +287,18 @@ int execute_pipeline(Pipeline *pipeline) {
     }
 
     if(!pipeline->background) {
+        int last_status = 0;
         for(int i = 0; i < pid_count; i++) {
-            int status;
-            waitpid(pids[i], &status, 0);
+            int status = 0;
+            if(waitpid(pids[i], &status, 0) > 0) {
+                if(WIFEXITED(status))
+                    last_status = WEXITSTATUS(status);
+                else if(WIFSIGNALED(status))
+                    last_status = 128 + WTERMSIG(status);
+            }
         }
+        sigprocmask(SIG_SETMASK, &old_mask, NULL);
+        return last_status;
     } else {
         for(int i = 0; i < pid_count; i++) {
             printf("[%d] %d\n", i + 1, pids[i]);

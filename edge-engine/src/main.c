@@ -85,8 +85,9 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-        if(execute_pipeline(&pipeline) < 0) {
-            fprintf(stderr, "Erro ao executar pipeline\n");
+        int exit_status = execute_pipeline(&pipeline);
+        if(exit_status < 0) {
+            fprintf(stderr, "edge-engine: erro interno ao configurar pipeline\n");
         }
 
         free_pipeline(&pipeline);
