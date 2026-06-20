@@ -16,7 +16,7 @@
 #define MAX_LINE_LENGTH 4096
 #define MAX_ARGS 64
 #define MAX_PIPES 32
-#define MAX_PATH 1024  /* Adicionar esta definição */
+#define MAX_PATH 1024
 
 typedef enum {
     MODE_INTERACTIVE,
@@ -35,8 +35,10 @@ typedef struct {
     Command commands[MAX_PIPES];
     int num_commands;
     int background;
-    char *producer;
-    char *consumer;
+    char *producer;   /* Nome do produtor (para <=) */
+    char *consumer;   /* Nome do consumidor (para =>) */
+    int has_producer; /* Flag se tem produtor */
+    int has_consumer; /* Flag se tem consumidor */
 } Pipeline;
 
 extern volatile sig_atomic_t child_status;

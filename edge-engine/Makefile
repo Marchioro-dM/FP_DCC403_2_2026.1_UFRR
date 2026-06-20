@@ -1,6 +1,6 @@
 # Compilador e flags
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -g -Iinclude
+CFLAGS = -Wall -Wextra -Werror -g -fPIE -Iinclude
 LDFLAGS = -lm
 
 # Diretórios
@@ -37,16 +37,16 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 # Linkar
 $(TARGET): $(OBJS) | $(BIN_DIR)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
-	@echo "✅ Build concluído: $(TARGET)"
+	@echo "Build concluído: $(TARGET)"
 
 # Limpeza
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
-	@echo "🧹 Limpeza concluída"
+	@echo "Limpeza concluída"
 
 # Testes
 test: $(TARGET)
-	@echo "🧪 Executando testes..."
+	@echo "Executando testes..."
 	@echo "--- Teste 1: ls -la ---"
 	@echo "ls -la" | $(TARGET)
 	@echo ""
@@ -61,13 +61,13 @@ test: $(TARGET)
 
 # Valgrind (se tiver script de teste)
 valgrind: $(TARGET)
-	@echo "🔍 Verificando com valgrind..."
+	@echo "Verificando com valgrind..."
 	@if [ -f tests/test_scripts/test1.txt ]; then \
 		valgrind --leak-check=full --show-leak-kinds=all \
 		         --track-origins=yes --verbose \
 		         $(TARGET) tests/test_scripts/test1.txt 2>&1 | tee valgrind.log; \
 	else \
-		echo "⚠️  Arquivo de teste não encontrado. Criando um..."; \
+		echo "Arquivo de teste não encontrado. Criando um..."; \
 		mkdir -p tests/test_scripts; \
 		echo "ls -la" > tests/test_scripts/test1.txt; \
 		echo "pwd" >> tests/test_scripts/test1.txt; \
@@ -87,7 +87,7 @@ tree:
 
 # Ajuda
 help:
-	@echo "📖 Comandos disponíveis:"
+	@echo "Comandos disponíveis:"
 	@echo "  make          - Compila o projeto"
 	@echo "  make clean    - Remove arquivos objetos e binário"
 	@echo "  make test     - Executa testes básicos"

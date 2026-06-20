@@ -19,6 +19,7 @@ int execute_builtin(Command *cmd) {
     if(strcmp(cmd->args[0], "echo") == 0) return builtin_echo(cmd);
     if(strcmp(cmd->args[0], "exit") == 0) return builtin_exit(cmd);
     if(strcmp(cmd->args[0], "fim") == 0) return builtin_exit(cmd);
+    
     return -1;
 }
 

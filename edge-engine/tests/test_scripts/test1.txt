@@ -1,5 +1,10 @@
-# Teste de comandos simples
-uname -a
-pwd
-echo "Hello Edge Engine!"
+# Script com processos em background
+echo "Iniciando processos em background..."
+sleep 10 &
+sleep 5 &
+echo "Processos em background iniciados!"
+echo "PID do sleep 10: $!"
+echo "Continuando execução..."
 ls -la
+echo "Fim do script"
+fim

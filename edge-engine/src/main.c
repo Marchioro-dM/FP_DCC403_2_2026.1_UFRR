@@ -53,22 +53,6 @@ char* read_line(FILE *input, int interactive) {
     return buffer;
 }
 
-void free_pipeline(Pipeline *pipeline) {
-    if(!pipeline) return;
-
-    for(int i = 0; i < pipeline->num_commands; i++) {
-        Command *cmd = &pipeline->commands[i];
-        if(cmd->input_file) {
-            free(cmd->input_file);
-            cmd->input_file = NULL;
-        }
-        if(cmd->output_file) {
-            free(cmd->output_file);
-            cmd->output_file = NULL;
-        }
-    }
-}
-
 int main(int argc, char *argv[]) {
     ExecutionMode mode = MODE_INTERACTIVE;
     FILE *input = stdin;
