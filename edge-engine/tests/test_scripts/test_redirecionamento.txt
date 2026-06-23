@@ -1,0 +1,32 @@
+echo === TESTE DE REDIRECIONAMENTOS ===
+
+echo [1/6] Redirecionamento de saida (>):
+echo conteudo_gravado > /tmp/edge_redir.txt
+echo Arquivo escrito. Lendo de volta:
+cat /tmp/edge_redir.txt
+
+echo [2/6] Redirecionamento de entrada (<):
+wc -l < /tmp/edge_redir.txt
+
+echo [3/6] Saida de pipeline para arquivo:
+cat /proc/loadavg | cat > /tmp/edge_redir_pipe.txt
+cat /tmp/edge_redir_pipe.txt
+
+echo [4/6] Sobrescrita de arquivo existente:
+echo primeira_versao > /tmp/edge_redir.txt
+echo segunda_versao > /tmp/edge_redir.txt
+echo Esperado: segunda_versao
+cat /tmp/edge_redir.txt
+
+echo [5/6] Anexar com append. Esperado tres linhas: linha_a linha_b linha_c
+echo linha_a > /tmp/edge_redir_app.txt
+echo linha_b >> /tmp/edge_redir_app.txt
+echo linha_c >> /tmp/edge_redir_app.txt
+cat /tmp/edge_redir_app.txt
+
+echo [6/6] Entrada e saida combinadas:
+sort < /tmp/edge_redir.txt > /tmp/edge_redir_sort.txt
+cat /tmp/edge_redir_sort.txt
+
+echo === REDIRECIONAMENTOS CONCLUIDO ===
+fim

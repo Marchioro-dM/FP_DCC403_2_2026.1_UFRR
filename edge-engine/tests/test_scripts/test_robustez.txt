@@ -1,0 +1,31 @@
+echo === TESTE DE ROBUSTEZ E TRATAMENTO DE ERROS ===
+
+echo [1/6] Comando inexistente nao derruba o motor:
+comando_que_nao_existe_xyz
+echo Motor sobreviveu ao comando invalido
+
+echo [2/6] Comando invalido dentro de pipeline:
+binario_falso | echo downstream_ainda_executa
+
+echo [3/6] cd para diretorio inexistente:
+cd /diretorio/que/nao/existe/edge
+echo Motor seguiu apos cd invalido
+pwd
+
+echo [4/6] Redirecionamento de entrada de arquivo inexistente:
+cat < /tmp/arquivo_inexistente_edge.xyz
+echo Motor seguiu apos redirecionamento invalido
+
+echo [5/6] Linhas vazias devem ser ignoradas:
+
+
+echo Linhas em branco acima foram ignoradas
+
+echo [6/6] Rajada de comandos invalidos seguida de comando valido:
+falso_1
+falso_2
+falso_3
+echo Motor estavel apos rajada de erros
+
+echo === ROBUSTEZ CONCLUIDO ===
+fim

@@ -1,0 +1,18 @@
+==9673== Memcheck, a memory error detector
+==9673== Copyright (C) 2002-2026, and GNU GPL'd, by Julian Seward et al.
+==9673== Using Valgrind-3.27.1 and LibVEX; rerun with -h for copyright info
+==9673== Command: bin/edge-engine tests/test_scripts/test_stress.txt
+==9673== 
+edge-engine: comando não encontrado: sensor_temp_invalido
+edge-engine: comando não encontrado: coletor_dados_x
+edge-engine: comando não encontrado: modulo_inexistente_abc
+edge-engine: comando não encontrado: pipeline_falso
+==9673== 
+==9673== HEAP SUMMARY:
+==9673==     in use at exit: 0 bytes in 0 blocks
+==9673==   total heap usage: 244 allocs, 244 frees, 7,966 bytes allocated
+==9673== 
+==9673== All heap blocks were freed -- no leaks are possible
+==9673== 
+==9673== For lists of detected and suppressed errors, rerun with: -s
+==9673== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

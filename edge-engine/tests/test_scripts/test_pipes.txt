@@ -1,0 +1,22 @@
+echo === TESTE DE PIPELINES ===
+
+echo [1/6] Pipe simples (dois estagios):
+echo hello edge engine | wc -w
+
+echo [2/6] Pipe triplo:
+cat /etc/passwd | head -5 | tail -2
+
+echo [3/6] Pipe com grep no meio:
+cat /proc/meminfo | grep Mem | head -3
+
+echo [4/6] Pipeline profundo (cat em cadeia):
+echo dados_de_borda | cat | cat | cat
+
+echo [5/6] Contagem de linhas via pipe:
+ls /etc | wc -l
+
+echo [6/6] Filtragem e ordenacao:
+echo c b a | tr ' ' '\n' | sort
+
+echo === PIPELINES CONCLUIDO ===
+fim

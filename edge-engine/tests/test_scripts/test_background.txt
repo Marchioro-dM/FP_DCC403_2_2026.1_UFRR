@@ -1,0 +1,27 @@
+echo === TESTE DE EXECUCAO EM BACKGROUND (&) E JOBS ===
+
+echo [1/5] Comando unico em background:
+sleep 2 &
+echo Comando lancado, motor continua sem bloquear
+
+echo [2/5] Listagem de jobs ativos com o built-in jobs:
+sleep 3 &
+sleep 3 &
+jobs
+
+echo [3/5] Pipeline em background (job com varios processos):
+sleep 2 | cat &
+jobs
+
+echo [4/5] Espera em foreground e reporte de conclusao:
+sleep 4
+echo Apos a espera, os jobs concluidos sao reportados acima e a lista esvazia:
+jobs
+
+echo [5/5] Echo em background (saida pode aparecer fora de ordem):
+echo job_bg_a &
+echo job_bg_b &
+echo job_fg_principal
+
+echo === BACKGROUND CONCLUIDO ===
+fim

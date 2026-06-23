@@ -4,8 +4,8 @@
 int is_builtin(Command *cmd) {
     if(cmd->argc == 0) return 0;
 
-    const char *builtins[] = {"cd", "pwd", "echo", "exit", "fim"};
-    for(int i = 0; i < 5; i++) {
+    const char *builtins[] = {"cd", "pwd", "echo", "exit", "fim", "jobs"};
+    for(int i = 0; i < 6; i++) {
         if(strcmp(cmd->args[0], builtins[i]) == 0) {
             return 1;
         }
@@ -19,7 +19,8 @@ int execute_builtin(Command *cmd) {
     if(strcmp(cmd->args[0], "echo") == 0) return builtin_echo(cmd);
     if(strcmp(cmd->args[0], "exit") == 0) return builtin_exit(cmd);
     if(strcmp(cmd->args[0], "fim") == 0) return builtin_exit(cmd);
-    
+    if(strcmp(cmd->args[0], "jobs") == 0) return builtin_jobs(cmd);
+
     return -1;
 }
 
@@ -57,4 +58,10 @@ int builtin_exit(Command *cmd) {
     (void)cmd;  /* Parâmetro não utilizado */
     exit(0);
     return 0; /* Nunca alcançado */
+}
+
+int builtin_jobs(Command *cmd) {
+    (void)cmd;  /* Parâmetro não utilizado */
+    list_jobs();
+    return 0;
 }

@@ -1,0 +1,27 @@
+echo === TESTE DE OPERADORES ESPECIAIS (FILAS DE MENSAGENS POSIX) ===
+
+echo [1/5] Consumidor: saida de um comando vira mensagem na fila log_sensor:
+echo evento_de_borda => log_sensor
+echo Produtor: drena a fila log_sensor para o stdout:
+cat <= log_sensor
+
+echo [2/5] Multiplas mensagens publicadas e drenadas:
+echo primeira_mensagem => fila_buffer
+echo segunda_mensagem => fila_buffer
+cat <= fila_buffer
+
+echo [3/5] Produtor combinado com pipe (fila -> grep):
+printf "linha_alfa\nlinha_beta\nlinha_gama\n" => fila_dados
+grep beta <= fila_dados
+
+echo [4/5] Forma do enunciado (comando alimentado pela fila telemetry_raw):
+printf "ERROR: temperatura\nINFO: ok\nERROR: pressao\n" => telemetry_raw
+grep ERROR <= telemetry_raw
+
+echo [5/5] Ponte direta fila->fila e releitura:
+echo carga_consolidada => fila_origem
+cat <= fila_origem => fila_destino
+cat <= fila_destino
+
+echo === OPERADORES ESPECIAIS CONCLUIDO ===
+fim

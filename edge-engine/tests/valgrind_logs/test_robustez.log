@@ -1,0 +1,21 @@
+==9661== Memcheck, a memory error detector
+==9661== Copyright (C) 2002-2026, and GNU GPL'd, by Julian Seward et al.
+==9661== Using Valgrind-3.27.1 and LibVEX; rerun with -h for copyright info
+==9661== Command: bin/edge-engine tests/test_scripts/test_robustez.txt
+==9661== 
+edge-engine: comando não encontrado: comando_que_nao_existe_xyz
+edge-engine: comando não encontrado: binario_falso
+cd: No such file or directory
+edge-engine: /tmp/arquivo_inexistente_edge.xyz: No such file or directory
+edge-engine: comando não encontrado: falso_1
+edge-engine: comando não encontrado: falso_2
+edge-engine: comando não encontrado: falso_3
+==9661== 
+==9661== HEAP SUMMARY:
+==9661==     in use at exit: 0 bytes in 0 blocks
+==9661==   total heap usage: 152 allocs, 152 frees, 6,949 bytes allocated
+==9661== 
+==9661== All heap blocks were freed -- no leaks are possible
+==9661== 
+==9661== For lists of detected and suppressed errors, rerun with: -s
+==9661== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

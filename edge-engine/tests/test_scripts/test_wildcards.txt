@@ -1,0 +1,22 @@
+echo === TESTE DE WILDCARDS (GLOB) ===
+
+echo Preparando arquivos de amostra:
+echo a > /tmp/edge_wc_sensor1.dat
+echo b > /tmp/edge_wc_sensor2.dat
+echo c > /tmp/edge_wc_sensor3.dat
+echo x > /tmp/edge_wc_log.txt
+
+echo [1/4] Expansao com asterisco (*.dat):
+ls /tmp/edge_wc_*.dat
+
+echo [2/4] Expansao com prefixo comum:
+ls /tmp/edge_wc_sensor*
+
+echo [3/4] Wildcard de caractere unico (?):
+ls /tmp/edge_wc_sensor?.dat
+
+echo [4/4] Wildcard combinado com pipe:
+ls /tmp/edge_wc_* | wc -l
+
+echo === WILDCARDS CONCLUIDO ===
+fim

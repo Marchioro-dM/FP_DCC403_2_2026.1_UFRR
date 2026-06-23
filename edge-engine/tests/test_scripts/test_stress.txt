@@ -1,0 +1,51 @@
+echo === TESTE DE ESTRESSE - EDGE ENGINE ===
+
+echo [1/6] Processos concorrentes em background:
+sleep 4 &
+sleep 4 &
+sleep 4 &
+sleep 3 &
+sleep 3 &
+sleep 2 &
+echo 6 processos em background ativos simultaneamente
+
+echo [2/6] Comandos inexistentes nao devem derrubar o motor:
+sensor_temp_invalido
+coletor_dados_x
+modulo_inexistente_abc
+pipeline_falso | echo saida_downstream
+echo Motor sobreviveu aos comandos invalidos
+
+echo [3/6] Pipelines profundos:
+cat /proc/meminfo | grep Mem | grep -v Swap | cat
+cat /proc/loadavg | cat | cat
+
+echo [4/6] Foreground durante background ativo:
+sleep 3 &
+date
+cat /proc/loadavg
+sleep 2 &
+uptime
+echo Motor respondeu normalmente com background rodando
+
+echo [5/6] Redirecionamentos e wildcards:
+cat /proc/meminfo | grep MemFree > /tmp/edge_stress_mem.txt
+cat /proc/loadavg > /tmp/edge_stress_load.txt
+date > /tmp/edge_stress_ts.txt
+ls /tmp/edge_stress_*.txt | cat
+cat /proc/loadavg => fila_stress
+cat <= fila_stress
+
+echo [6/6] Rajada de comandos sequenciais:
+echo rafalha_1 &
+echo rajada_2 &
+echo rajada_3 &
+date
+pwd
+echo rajada_4 &
+echo rajada_5 &
+cat /proc/loadavg
+echo Motor estavel apos rajada
+
+echo === ESTRESSE CONCLUIDO - MOTOR ESTAVEL ===
+fim

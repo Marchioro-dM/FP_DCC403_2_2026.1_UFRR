@@ -1,0 +1,29 @@
+echo === EDGE ENGINE - CICLO DE TELEMETRIA IIoT ===
+
+echo [1/6] Timestamp da coleta:
+date
+
+echo [2/6] Carga do processador:
+cat /proc/loadavg
+
+echo [3/6] Memoria disponivel via pipeline:
+cat /proc/meminfo | grep MemAvailable
+
+echo [4/6] Pipeline duplo - memoria total x livre:
+cat /proc/meminfo | grep Mem | grep -v Swap
+
+echo [5/6] Persistencia de dados com redirecionamento:
+date > /tmp/edge_ts.txt
+cat /proc/loadavg > /tmp/edge_load.txt
+cat /proc/meminfo | grep MemAvailable > /tmp/edge_mem.txt
+uptime > /tmp/edge_uptime.txt
+echo Snapshots salvos. Arquivos gerados:
+ls /tmp/edge_*.txt
+
+echo [6/6] Telemetria via fila de mensagens POSIX (consumidor -> produtor):
+cat /proc/loadavg => telemetry_raw
+echo Carga republicada pela fila telemetry_raw:
+cat <= telemetry_raw
+
+echo === CICLO CONCLUIDO ===
+fim

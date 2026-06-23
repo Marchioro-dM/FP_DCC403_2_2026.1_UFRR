@@ -1,0 +1,21 @@
+echo === TESTE DE COMANDOS INTERNOS (BUILTINS) ===
+
+echo [1/5] pwd no diretorio atual:
+pwd
+
+echo [2/5] cd para diretorio absoluto e pwd:
+cd /tmp
+pwd
+
+echo [3/5] cd - volta ao diretorio anterior:
+cd -
+pwd
+
+echo [4/5] echo com varios argumentos:
+echo edge engine motor de borda IIoT
+
+echo [5/5] echo de string vazia (linha em branco esperada):
+echo
+
+echo === BUILTINS CONCLUIDO ===
+fim

@@ -11,5 +11,6 @@ int builtin_cd(Command *cmd);
 int builtin_pwd(Command *cmd);
 int builtin_echo(Command *cmd);
 int builtin_exit(Command *cmd);
+int builtin_jobs(Command *cmd);
 
 #endif

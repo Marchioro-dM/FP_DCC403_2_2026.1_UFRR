@@ -1,7 +1,7 @@
 # Compilador e flags
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -g -fPIE -Iinclude
-LDFLAGS = -lm
+LDFLAGS = -lm -lrt
 
 # Diretórios
 SRC_DIR = src
@@ -42,40 +42,21 @@ $(TARGET): $(OBJS) | $(BIN_DIR)
 # Limpeza
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
-	@echo "Limpeza concluída"
+	@echo "Limpo."
 
-# Testes
-test: $(TARGET)
-	@echo "Executando testes..."
-	@echo "--- Teste 1: ls -la ---"
-	@echo "ls -la" | $(TARGET)
-	@echo ""
-	@echo "--- Teste 2: pwd ---"
-	@echo "pwd" | $(TARGET)
-	@echo ""
-	@echo "--- Teste 3: echo ---"
-	@echo 'echo "Hello Edge Engine!"' | $(TARGET)
-	@echo ""
-	@echo "--- Teste 4: Comandos built-in ---"
-	@echo -e "cd /tmp\npwd\ncd -\npwd" | $(TARGET)
-
-# Valgrind (se tiver script de teste)
+# Valgrind: roda todos os scripts de teste verificando vazamentos
 valgrind: $(TARGET)
-	@echo "Verificando com valgrind..."
-	@if [ -f tests/test_scripts/test1.txt ]; then \
-		valgrind --leak-check=full --show-leak-kinds=all \
-		         --track-origins=yes --verbose \
-		         $(TARGET) tests/test_scripts/test1.txt 2>&1 | tee valgrind.log; \
-	else \
-		echo "Arquivo de teste não encontrado. Criando um..."; \
-		mkdir -p tests/test_scripts; \
-		echo "ls -la" > tests/test_scripts/test1.txt; \
-		echo "pwd" >> tests/test_scripts/test1.txt; \
-		echo "echo 'Hello'" >> tests/test_scripts/test1.txt; \
-		valgrind --leak-check=full --show-leak-kinds=all \
-		         --track-origins=yes --verbose \
-		         $(TARGET) tests/test_scripts/test1.txt 2>&1 | tee valgrind.log; \
-	fi
+	@mkdir -p tests/valgrind_logs
+	@for f in tests/test_scripts/*.txt; do \
+		name=$$(basename $$f .txt); \
+		echo "=== valgrind: $$name ==="; \
+		valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes \
+		         --trace-children=no --child-silent-after-fork=yes \
+		         --error-exitcode=99 \
+		         $(TARGET) $$f >/dev/null 2>tests/valgrind_logs/$$name.log; \
+		grep -E "in use at exit|ERROR SUMMARY" tests/valgrind_logs/$$name.log \
+		     | sed 's/^==[0-9]*== //'; \
+	done
 
 # Debug
 debug: CFLAGS += -DDEBUG -g -O0
@@ -90,10 +71,9 @@ help:
 	@echo "Comandos disponíveis:"
 	@echo "  make          - Compila o projeto"
 	@echo "  make clean    - Remove arquivos objetos e binário"
-	@echo "  make test     - Executa testes básicos"
-	@echo "  make valgrind - Verifica vazamentos de memória"
+	@echo "  make valgrind - Verifica vazamentos de memória em todos os testes"
 	@echo "  make debug    - Compila com flags de debug"
 	@echo "  make tree     - Mostra estrutura do projeto"
 	@echo "  make help     - Mostra esta mensagem"
 
-.PHONY: all clean test valgrind debug tree help
+.PHONY: all clean valgrind debug tree help

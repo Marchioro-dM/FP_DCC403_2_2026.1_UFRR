@@ -16,31 +16,43 @@ int detect_operators(char *line, Pipeline *pipeline) {
     char saved;
     int found = 0;
 
-    /* Producer <=: two syntaxes supported:
-     *   "<= file command"  — <= at the start, file to the right
-     *   "file <= command"  — <= in the middle, file to the left
+    /* Produtor <= : a fila nomeada fica sempre à direita do operador.
+     * Duas formas aceitas:
+     *   "comando <= fila [resto]"  — forma do enunciado (<= no meio)
+     *   "<= fila comando"          — atalho (<= no início)
+     * Em ambas, producer = primeiro token após "<=" e o restante (esquerda +
+     * o que houver após a fila) compõe a linha de comando do pipeline.
      */
     pos = strstr(line, "<=");
     if(pos) {
         pipeline->has_producer = 1;
+
+        /* Recorta o nome da fila (primeiro token após "<="). */
+        char *name_start = pos + 2;
+        while(isspace((unsigned char)*name_start)) name_start++;
+        char *name_end = name_start;
+        while(*name_end && !isspace((unsigned char)*name_end)) name_end++;
+        saved = *name_end; *name_end = '\0';
+        pipeline->producer = strdup(name_start);
+        *name_end = saved;
+
+        char *rest = name_end;
+        while(isspace((unsigned char)*rest)) rest++;
+
         if(pos == line) {
-            /* <= file command */
-            start = pos + 2;
-            while(isspace((unsigned char)*start)) start++;
-            end = start;
-            while(*end && !isspace((unsigned char)*end)) end++;
-            saved = *end; *end = '\0';
-            pipeline->producer = strdup(start);
-            *end = saved;
-            memmove(line, end, strlen(end) + 1);
+            /* "<= fila comando" : a linha de comando é só o resto. */
+            memmove(line, rest, strlen(rest) + 1);
         } else {
-            /* file <= command */
-            char *cmd_start = pos + 2;
-            while(isspace((unsigned char)*cmd_start)) cmd_start++;
+            /* "esquerda <= fila resto" : junta esquerda + resto. */
             *pos = '\0';
             trim_whitespace(line);
-            pipeline->producer = strdup(line);
-            memmove(line, cmd_start, strlen(cmd_start) + 1);
+            char rebuilt[MAX_LINE_LENGTH];
+            if(*rest)
+                snprintf(rebuilt, sizeof(rebuilt), "%s %s", line, rest);
+            else
+                snprintf(rebuilt, sizeof(rebuilt), "%s", line);
+            strncpy(line, rebuilt, MAX_LINE_LENGTH - 1);
+            line[MAX_LINE_LENGTH - 1] = '\0';
         }
         trim_whitespace(line);
         found = 1;
@@ -174,6 +186,7 @@ int parse_command(char *cmd_str, Command *cmd) {
                     strncpy(temp, start, len);
                     temp[len] = '\0';
                     cmd->output_file = strdup(temp);
+                    cmd->append = 1;
                 }
             }
             else {
@@ -205,6 +218,7 @@ int parse_line(char *line, Pipeline *pipeline) {
     pipeline->has_consumer = 0;
     pipeline->producer = NULL;
     pipeline->consumer = NULL;
+    pipeline->raw = strdup(line);   /* rótulo para jobs em background */
 
     trim_whitespace(line_copy);
     size_t len = strlen(line_copy);
@@ -265,5 +279,10 @@ void free_pipeline(Pipeline *pipeline) {
     if(pipeline->consumer) {
         free(pipeline->consumer);
         pipeline->consumer = NULL;
+    }
+
+    if(pipeline->raw) {
+        free(pipeline->raw);
+        pipeline->raw = NULL;
     }
 }
